@@ -1,54 +1,138 @@
-﻿@model WeCook.Models.Recipes.Recipe
+﻿@using WeCook.Models.Recipes
+@model WeCook.Models.Recipes.Recipe
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
-
-<h4>Recipe</h4>
+<h2 class="text-center">Recette: @Model.Name</h2>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+<div class="d-flex justify-content-center">
+    <div class="col-md-8">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <h4 class="text-center">Recette</h4>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <input type="hidden" asp-for="ImageName" />
+            
+            <div class="col-12 d-flex justify-content-start mb-2">
+                <div class="form-group col-9 me-2">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group flex-grow-1">
+                    <label asp-for="Type" class="control-label"></label>
+                    <select asp-for="Type" class="form-control ps-2" asp-items="@Html.GetEnumSelectList<RecipeType>()">
+                        <option value="" selected disabled hidden></option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Difficulty" class="control-label"></label>
-                <input asp-for="Difficulty" class="form-control" />
-                <span asp-validation-for="Difficulty" class="text-danger"></span>
+            <div class="col-12 d-flex justify-content-between flex-row mb-2">
+                <div class="form-group col-2">
+                    <div><i class="fa-solid fa-star me-2"></i><label asp-for="Difficulty" class="control-label"></label></div>
+                    <input asp-for="Difficulty" class="form-control" />
+                    <span asp-validation-for="Difficulty" class="text-danger"></span>
+                </div>
+                <div class="form-group col-2">
+                    <div><i class="fa-solid fa-people-group me-2"></i><label asp-for="PeopleFor" class="control-label"></label></div>
+                    <input asp-for="PeopleFor" class="form-control" />
+                    <span asp-validation-for="PeopleFor" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <div><i class="fa-solid fa-clock me-2"></i><label asp-for="PreparationTime" class="control-label"></label></div>
+                    <input asp-for="PreparationTime" class="form-control" placeholder="Minutes"/>
+                    <span asp-validation-for="PreparationTime" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <div><i class="fa-solid fa-temperature-high me-2"></i><label asp-for="CookingTime" class="control-label"></label></div>
+                    <input asp-for="CookingTime" class="form-control" placeholder="Minutes"/>
+                    <span asp-validation-for="CookingTime" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="PreparationTime" class="control-label"></label>
-                <input asp-for="PreparationTime" class="form-control" />
-                <span asp-validation-for="PreparationTime" class="text-danger"></span>
+            <div class="form-group col-12">
+                <label asp-for="ImageFile" class="control-label d-block"></label>
+                <input class="form-control" asp-for="ImageFile" accept="image/*" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CookingTime" class="control-label"></label>
-                <input asp-for="CookingTime" class="form-control" />
-                <span asp-validation-for="CookingTime" class="text-danger"></span>
+            <div class="col-12 mt-3 d-flex flex-row mb-1">
+                <h4 class="flex-grow-1 mb-0">Ingrédients</h4>
+                <div class="d-flex justify-content-center">
+                    <div id="btn-add-ingredient" class="btn btn-sm btn-success me-2"><i class="fa-solid fa-plus me-2"></i>Ajouter</div>
+                    <div id="btn-rmv-ingredient" class="btn btn-sm btn-warning"><i class="fa-solid fa-trash me-2"></i>Retirer</div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ImageName" class="control-label"></label>
-                <input asp-for="ImageName" class="form-control" />
-                <span asp-validation-for="ImageName" class="text-danger"></span>
+            <div id="IngredientsContainer">
+                
+                    <input type="hidden" id="IngredientsCount" value="@Model.Ingredients.Count" />
+                    @{
+                    var i = 0;
+                    foreach(var ingredient in Model.Ingredients)
+                    {
+                        <div class="Ingredient col-12 d-flex flex-row justify-content-between">
+                            <input type="hidden" asp-for="Ingredients[i].Id"/>
+                            <div class="form-group col-8 me-1">
+                                <label asp-for="Ingredients[i].Name" class="control-label"></label>
+                                <input asp-for="Ingredients[i].Name" class="form-control" />
+                                <span asp-validation-for="Ingredients[i].Name" class="text-danger"></span>
+                            </div>
+                            <div class="flex-grow-1 d-flex flex-row justify-content-end">
+                                <div class="form-group flex-grow-1">
+                                    <label asp-for="Ingredients[i].Quantity" class="control-label"></label>
+                                    <input asp-for="Ingredients[i].Quantity" class="form-control" />
+                                    <span asp-validation-for="Ingredients[i].Quantity" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-6 ms-1">
+                                    <label asp-for="Ingredients[i].Unit" class="control-label"></label>
+                                    <select asp-for="Ingredients[i].Unit" class="form-control ps-2 IngredientUnitReferrer" asp-items="@Html.GetEnumSelectList<IngredientUnit>()"></select>
+                                    <span asp-validation-for="Ingredients[i].Unit" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        i++;
+                    }
+                    }
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="col-12 mt-3 d-flex flex-row mb-1">
+                <h4 class="flex-grow-1 mb-0">Étapes</h4>
+                <div class="d-flex justify-content-center">
+                    <div id="btn-add-step" class="btn btn-sm btn-success me-2"><i class="fa-solid fa-plus me-2"></i>Ajouter</div>
+                    <div id="btn-rmv-step" class="btn btn-sm btn-warning"><i class="fa-solid fa-trash me-2"></i>Retirer</div>
+                </div>
+            </div>
+            <div id="StepsContainer">
+                <input type="hidden" id="StepsCount" value="@Model.Steps.Count" />
+                @{
+                var j = 0;
+                foreach(var step in Model.Steps)
+                {
+                    <div class="Step col-12">
+                    <div class="col-12">Étape @(j+1)</div>
+                        <input type="hidden" asp-for="Steps[j].Id"/>    
+                        <div class="form-group">
+                            <textarea asp-for="Steps[j].Description" class="form-control" rows="1"></textarea>
+                            <span asp-validation-for="Steps[j].Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                    j++;
+                }
+                }
+            </div>
+            <div class="col-12 mt-3 d-flex justify-content-center">
+                <div class="col-6 d-flex justify-content-end">
+                    <input type="submit" value="Terminer" class="btn btn-primary me-2" />
+                </div>
+                <div class="col-6 d-flex justify-content-start">
+                    <a class="btn btn-danger ms-2" asp-action="Details" asp-route-id="@Model.Id">Annuler</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
+    <script src="~/js/RecipeForm.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

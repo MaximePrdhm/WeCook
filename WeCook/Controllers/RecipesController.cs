@@ -111,7 +111,10 @@ namespace WeCook.Controllers
                 return NotFound();
             }
 
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (recipe == null)
             {
                 return NotFound();
@@ -124,7 +127,7 @@ namespace WeCook.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Difficulty,PreparationTime,CookingTime,Duration,ImageName")] Recipe recipe)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Difficulty,Type,PeopleFor,PreparationTime,CookingTime,ImageFile,ImageName,Ingredients,Steps")] Recipe recipe)
         {
             if (id != recipe.Id)
             {
@@ -135,7 +138,45 @@ namespace WeCook.Controllers
             {
                 try
                 {
+                    if(recipe.ImageFile != null)
+                    {
+                        System.IO.File.Delete(Path.Combine(_env.WebRootPath, "uploads", "recipes", recipe.ImageName));
+                        var fileName = $"${Guid.NewGuid()}{Path.GetExtension(recipe.ImageFile.FileName)}";
+                        var filePath = Path.Combine(_env.WebRootPath, "uploads", "recipes", fileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await recipe.ImageFile.CopyToAsync(fileStream);
+                        }
+                        recipe.ImageName = fileName;
+                    }
+
+                    for (int i = 1; i <= recipe.Steps.Count; i++)
+                    {
+                        recipe.Steps[i - 1].Position = i;
+                    }
+
+                    var missingIngredients = _context.Ingredients
+                        .Where(i => i.RecipeId == id)
+                        .Select(i => i.Id)
+                        .ToList()
+                        .Except(recipe.Ingredients.Select(i => i.Id).ToList())
+                        .ToList()
+                        .Select(id => _context.Ingredients.Where(i => i.Id == id).First())
+                        .ToList();
+
+                    var missingSteps = _context.Steps
+                        .Where(s => s.RecipeId == id)
+                        .Select(s => s.Id)
+                        .ToList()
+                        .Except(recipe.Steps.Select(s => s.Id).ToList())
+                        .ToList()
+                        .Select(id => _context.Steps.Where(s => s.Id == id).First())
+                        .ToList();
+
+                    _context.Ingredients.RemoveRange(missingIngredients);
+                    _context.Steps.RemoveRange(missingSteps);
                     _context.Update(recipe);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -186,8 +227,10 @@ namespace WeCook.Controllers
             {
                 _context.Recipes.Remove(recipe);
             }
-            
             await _context.SaveChangesAsync();
+            
+            System.IO.File.Delete(Path.Combine(_env.WebRootPath, "uploads", "recipes", recipe.ImageName));
+
             return RedirectToAction(nameof(Index));
         }
 
