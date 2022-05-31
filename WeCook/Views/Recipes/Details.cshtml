@@ -1,0 +1,104 @@
+﻿@using WeCook.Models.Recipes
+@model WeCook.Models.Recipes.Recipe
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery csrf
+
+@functions{
+    public string GetAntiCsrfToken()
+    {
+        return csrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+@{
+    ViewData["Title"] = "Details";
+
+    var preparation = (Model.PreparationTime != 0) ? Model.PreparationTime.ToString() : "-";
+    var cooking = (Model.CookingTime != 0) ? Model.CookingTime.ToString() : "-";
+}
+
+<input type="hidden" id="RequestCsrfToken" name="RequestCsrfToken" value="@GetAntiCsrfToken()"/>
+<input type="hidden" asp-for="Id" />
+
+<div class="col-8 mx-auto border border-secondary rounded d-flex flex-column align-items-center">
+    
+    <h1 class="fw-bold mt-2">@Model.Name</h1>
+    
+    <span class="badge rounded-pill bg-success fs-5">@Html.DisplayFor(modelItem => Model.Type)</span>
+    
+    <img class="col-11 rounded my-3" alt="Recipe Image" src="~/uploads/recipes/@Model.ImageName" />
+
+    <div class="col-9 mt-2">
+        <div class="d-flex justify-content-center align-items-center flex-column">
+            <span class="fw-bold d-block text-center mb-1">Difficulté</span>
+            <div class="d-flex justify-content-center">
+                @for(var i = 0; i < Model.Difficulty; i++)
+                {
+                    <i class="fa-solid fa-star mx-1"></i>
+                }
+                @for(var i = 0; i < 5 - Model.Difficulty; i++)
+                {
+                    <i class="fa-regular fa-star mx-1"></i>
+                }
+            </div>    
+        </div>
+        <hr />
+        <div class="d-flex justify-content-evenly align-items-center">
+            <div><span class="fw-bold d-block text-center">Temps total</span>@Model.Duration Minutes</div>
+            •
+            <div><span class="fw-bold d-block text-center">Préparation</span>@preparation Minutes</div>
+            •
+            <div><span class="fw-bold d-block text-center">Cuisson</span>@cooking Minutes</div>
+        </div>
+    </div>
+
+    <h2 class="mt-3">Ingrédients</h2>
+
+    <div class="d-flex align-items-center">
+        <button class="btn btn-warning" id="btn-rmv-people"><i class="fa-solid fa-minus"></i></button>
+        <div class="mx-3"><span id="NbrPeople">@Model.PeopleFor</span> Personnes</div>
+        <button class="btn btn-success" id="btn-add-people"><i class="fa-solid fa-plus"></i></button>
+    </div>
+
+    <div class="col-10 mt-2">
+        <table class="table table-secondary table-striped table-hover">
+            <thead>
+                <tr>
+                    <th class="w-75">Nom</th>
+                    <th class="w-25">Quantité</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var j = 0; 
+                    foreach(var ingredient in Model.Ingredients)
+                    {
+                        <tr>
+                            <td>@ingredient.Name</td>
+                            <td>
+                                <span id="IngredientQuantity@(ingredient.Id)">@ingredient.Quantity</span>
+                                <span>@ingredient.DisplayUnit</span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <h2 class="mt-3">Étapes</h2>
+
+    <div class="col-10 mt-2">
+        @foreach(var step in Model.Steps)
+        {
+            <div class="col mb-3">
+                <p class="text-uppercase fw-bold fs-5 mb-1">Étape @step.Position</p>
+                <p class="lead" style="text-align: justify;">@step.Description</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/IngredientProportions.js"></script>
+}
