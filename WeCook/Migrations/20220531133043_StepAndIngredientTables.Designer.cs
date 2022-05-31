@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WeCook.Models.Database;
 
@@ -10,9 +11,10 @@ using WeCook.Models.Database;
 namespace WeCook.Migrations
 {
     [DbContext(typeof(WeCookDbContext))]
-    partial class WeCookDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220531133043_StepAndIngredientTables")]
+    partial class StepAndIngredientTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

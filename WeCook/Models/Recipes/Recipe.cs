@@ -44,10 +44,9 @@ namespace WeCook.Models.Recipes
         [Display(Name = "Personnes")]
         public int PeopleFor { get; set; }
 
-        [Required(ErrorMessage = "Champ requis")]
         [NotMapped]
         [Display(Name = "Image de la recette")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
         [ValidateNever]
@@ -64,6 +63,14 @@ namespace WeCook.Models.Recipes
             if(PreparationTime + CookingTime == 0)
             {
                 yield return new ValidationResult("Temps total nul non accepté", new List<string>() { nameof(PreparationTime), nameof(CookingTime) });
+            }
+
+            if(Id == 0)
+            {
+                if(ImageFile == null)
+                {
+                    yield return new ValidationResult("Champ requis", new List<string>() { nameof(ImageFile) });
+                }
             }
         }
     }

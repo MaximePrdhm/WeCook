@@ -18,5 +18,7 @@ namespace WeCook.Models.Database
         }
 
         public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<Step> Steps { get; set; }
     }
 }
