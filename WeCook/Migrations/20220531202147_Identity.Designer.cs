@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WeCook.Models.Database;
 
@@ -11,9 +12,10 @@ using WeCook.Models.Database;
 namespace WeCook.Migrations
 {
     [DbContext(typeof(WeCookDbContext))]
-    partial class WeCookDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220531202147_Identity")]
+    partial class Identity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,7 +184,7 @@ namespace WeCook.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredient");
                 });
 
             modelBuilder.Entity("WeCook.Models.Recipes.Recipe", b =>
@@ -250,7 +252,7 @@ namespace WeCook.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("Steps");
+                    b.ToTable("Step");
                 });
 
             modelBuilder.Entity("WeCook.Models.Users.User", b =>
