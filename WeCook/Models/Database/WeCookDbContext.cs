@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WeCook.Models.Recipes;
+using WeCook.Models.Users;
 
 namespace WeCook.Models.Database
 {
-    public class WeCookDbContext : DbContext 
+    public class WeCookDbContext : IdentityDbContext<User> 
     {
         public WeCookDbContext(DbContextOptions<WeCookDbContext> options) : base(options) { }
 

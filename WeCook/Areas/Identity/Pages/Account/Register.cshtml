@@ -1,0 +1,96 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Inscription";
+
+    var days = ViewData["Days"] as List<SelectListItem>;
+    var months = ViewData["Months"] as List<SelectListItem>;
+    var years = ViewData["Years"] as List<SelectListItem>;
+}
+
+<div class="mt-5 container d-flex justify-content-center align-items-center">
+    <div class="card border-primary col-12 col-lg-7">
+        <div class="card-body">
+            <h2 class="mb-4">@ViewData["Title"]</h2>
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="form-group w-50">
+                        <label asp-for="Input.FirstName" class="fw-bold"></label>
+                        <input asp-for="Input.FirstName" class="form-control" aria-required="true" />
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group w-50">
+                        <label asp-for="Input.LastName" class="fw-bold"></label>
+                        <input asp-for="Input.LastName" class="form-control" aria-required="true" />
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="w-100 fw-bold">Date de Naissance</div>
+                    <div class="form-group w-25">
+                        <label asp-for="Input.BirthDay"></label>
+                        <select class="form-select" asp-for="Input.BirthDay" asp-items="@days" aria-required="true">
+                            <option value="" disabled selected hidden></option>
+                        </select>
+                        <span asp-validation-for="Input.BirthDay" class="text-danger"></span>
+                    </div>
+                    <div class="form-group w-50">
+                        <label asp-for="Input.BirthMonth"></label>
+                        <select class="form-select" asp-for="Input.BirthMonth" asp-items="@months" aria-required="true">
+                            <option value="" disabled selected hidden></option>
+                        </select>
+                        <span asp-validation-for="Input.BirthMonth" class="text-danger"></span>
+                    </div>
+                    <div class="form-group w-25">
+                        <label asp-for="Input.BirthYear"></label>
+                        <select class="form-select" asp-for="Input.BirthYear" asp-items="@years" aria-required="true">
+                            <option value="" disabled selected hidden></option>
+                        </select>
+                        <span asp-validation-for="Input.BirthYear" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.ImageFile" class="control-label d-block fw-bold"></label>
+                    <input class="form-control" asp-for="Input.ImageFile" accept="image/*" />
+                    <span asp-validation-for="Input.ImageFile" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.Email" class="fw-bold"></label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="form-group w-50">
+                        <label asp-for="Input.Password" class="fw-bold"></label>
+                        <input asp-for="Input.Password" class="form-control" aria-required="true" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group w-50">
+                        <label asp-for="Input.ConfirmPassword" class="fw-bold"></label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" aria-required="true" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-end mt-2">
+                    <button id="registerSubmit" type="submit" class="btn btn-primary rounded">Inscription</button>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <div class="text-center">
+                <a asp-page="./Login" class="d-block link-primary" asp-route-returnUrl="@Model.ReturnUrl">Déjà un compte?</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

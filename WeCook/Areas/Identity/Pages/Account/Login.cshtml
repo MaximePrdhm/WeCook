@@ -1,0 +1,53 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="mt-5 container d-flex justify-content-center align-items-center">
+    <div class="card border-primary col-5">
+        <div class="card-body">
+            <h2 class="mb-4">@ViewData["Title"]</h2>
+            <form id="account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.Email" class="fw-bold"></label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Input.Password" class="fw-bold"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                
+                <div class="my-2">
+                    <div class="checkbox">
+                        <label asp-for="Input.RememberMe" class="form-label">
+                            <input class="form-check-input" asp-for="Input.RememberMe" />
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-end mt-2">
+                    <button id="login-submit" type="submit" class="btn btn-primary rounded">Connexion</button>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <div class="text-center">
+                <!--<a id="forgot-password" class="d-block link-primary" asp-page="./ForgotPassword">Mot de passe oublié ?</a>-->
+                <a asp-page="./Register" class="d-block link-primary" asp-route-returnUrl="@Model.ReturnUrl">Créer un compte</a>
+                <!--<a id="resend-confirmation" class="d-block link-primary" asp-page="./ResendEmailConfirmation">Renvoyer un email de confirmation</a>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
