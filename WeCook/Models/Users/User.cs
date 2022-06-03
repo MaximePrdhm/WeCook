@@ -9,8 +9,8 @@ namespace WeCook.Models.Users
         public string Name { get; set; }
         public string FirstName { get; set; }
         public DateTime BirthDate { get; set; }
-        [NotMapped]
-        public IFormFile? AvatarFile { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
         [ValidateNever]
         public string AvatarName { get; set; }
     }

@@ -12,8 +12,7 @@ builder.Services.AddDbContext<WeCookDbContext>(options =>
 {
     options.UseSqlServer(@"Server=(localdb)\mssqllocaldb; Database=WeCook; Trusted_Connection=True;");
 });
-builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddDefaultTokenProviders()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddDefaultUI()
     .AddEntityFrameworkStores<WeCookDbContext>();
 var app = builder.Build();
