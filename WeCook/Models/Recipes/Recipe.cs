@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WeCook.Models.Users;
 
 namespace WeCook.Models.Recipes
 {
@@ -56,6 +57,14 @@ namespace WeCook.Models.Recipes
         public IList<Step> Steps { get; set; } = new List<Step>();
 
         public IList<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+
+        [ValidateNever]
+        public string CreatorId { get; set; }
+        [ValidateNever]
+        public User Creator { get; set; }
+
+        [ValidateNever]
+        public List<UserRecipe> Likes { get; set; }
 
 
         public IEnumerable<ValidationResult> Validate(ValidationContext context)

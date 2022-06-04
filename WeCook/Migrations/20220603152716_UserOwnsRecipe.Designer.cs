@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WeCook.Models.Database;
 
@@ -11,9 +12,10 @@ using WeCook.Models.Database;
 namespace WeCook.Migrations
 {
     [DbContext(typeof(WeCookDbContext))]
-    partial class WeCookDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220603152716_UserOwnsRecipe")]
+    partial class UserOwnsRecipe
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,21 +261,6 @@ namespace WeCook.Migrations
                     b.ToTable("Steps");
                 });
 
-            modelBuilder.Entity("WeCook.Models.Recipes.UserRecipe", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "RecipeId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("Likes", (string)null);
-                });
-
             modelBuilder.Entity("WeCook.Models.Users.User", b =>
                 {
                     b.Property<string>("Id")
@@ -441,38 +428,15 @@ namespace WeCook.Migrations
                     b.Navigation("Recipe");
                 });
 
-            modelBuilder.Entity("WeCook.Models.Recipes.UserRecipe", b =>
-                {
-                    b.HasOne("WeCook.Models.Recipes.Recipe", "Recipe")
-                        .WithMany("Likes")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WeCook.Models.Users.User", "User")
-                        .WithMany("LikedRecipes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Recipe");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WeCook.Models.Recipes.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
-
-                    b.Navigation("Likes");
 
                     b.Navigation("Steps");
                 });
 
             modelBuilder.Entity("WeCook.Models.Users.User", b =>
                 {
-                    b.Navigation("LikedRecipes");
-
                     b.Navigation("Recipes");
                 });
 #pragma warning restore 612, 618

@@ -15,8 +15,8 @@
                 @user.FirstName @user.Name
             </button>
             <div class="dropdown-menu text-dark" aria-labelledby="navDropdown">
-                <a class="dropdown-item text-dark" href="#">Mes Recettes</a>
-                <a class="dropdown-item text-dark" href="#">Mon Profil</a>
+                <a class="dropdown-item text-dark" asp-controller="Book" asp-action="Me">Carnet de Recettes</a>
+                <a class="dropdown-item text-dark" href="#">Profil</a>
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-item">
                     <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

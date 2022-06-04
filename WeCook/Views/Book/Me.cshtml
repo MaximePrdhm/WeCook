@@ -1,0 +1,73 @@
+﻿@model WeCook.Models.ViewModel.RecipeBook.UserRecipeBookViewModel
+
+@{
+    var difficulties = new string[] { "Novice", "Amateur", "Intermédiaire", "Confirmé", "Expert" };
+    ViewData["Title"] = "Carnet de Recettes";
+}
+
+<div class="col-12 d-flex flex-row mb-2">
+    <h2 class="flex-grow-1 mb-0">Mes Recettes</h2>
+    <div class="d-flex align-items-center pe-2">
+        <a asp-controller="Recipes" asp-action="Create" class="btn btn-outline-success">
+            <i class="fa fa-solid fa-plus me-2"></i> Nouvelle recette
+        </a>
+    </div>
+</div>
+@if(Model.CreatedRecipes.Count == 0)
+{
+    <p class="lead">Vous n'avez pas encore créé de recettes sur la plateforme. Vous pouvez en créer une <a asp-controller="Recipes" asp-action="Create" class="link-info">Ici</a></p>
+} else
+{
+    <div class="container d-flex justify-content-start flex-wrap p-0 mb-4">
+    @foreach(var item in Model.CreatedRecipes)
+    {
+        <div class="col-3 pb-2 pe-2">
+            <div class="card rounded">
+                <a asp-controller="Recipes" asp-action="Details" asp-route-id="@item.Id" class="text-reset text-decoration-none">
+                    <img class="card-img-top w-100" style="aspect-ratio: 16/9" src="~/uploads/recipes/@item.ImageName" alt="Recipe Card Image">
+                    <div class="card-img-overlay d-flex flex-row-reverse">
+                        <div class="px-2 rounded bg-success" style="height:25px;">@Html.DisplayFor(modelItem => item.Type)</div>
+                    </div>
+                    <h5 class="card-title text-truncate text-center mt-1">@item.Name</h5>
+                    <div class="col-12 p-2 d-flex justify-content-between">
+                        <div><i class="fa-solid fa-star d-block text-center"></i>@difficulties[item.Difficulty-1]</div>
+                        <div><i class="fa-solid fa-clock d-block text-center"></i>@item.PreparationTime min.</div>
+                        <div><i class="fa-solid fa-temperature-high d-block text-center"></i>@item.CookingTime min.</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+    </div>
+}
+
+<div class="col-12 d-flex flex-row mb-2">
+    <h2 class="flex-grow-1 mb-0">Mes Likes</h2>
+</div>
+@if(Model.LikedRecipes.Count == 0)
+{
+    <p class="lead">Vous n'avez pas encore ajouté de recettes à votre carnet.<br>Partez à la découverte de vos futures créations <a asp-controller="Recipes" asp-action="Index" class="link-info">Ici</a></p>
+} else
+{
+    <div class="container d-flex justify-content-start flex-wrap p-0">
+    @foreach(var item in Model.LikedRecipes)
+    {
+        <div class="col-3 pb-2 pe-2">
+            <div class="card rounded">
+                <a asp-controller="Recipes" asp-action="Details" asp-route-id="@item.Id" class="text-reset text-decoration-none">
+                    <img class="card-img-top w-100" style="aspect-ratio: 16/9" src="~/uploads/recipes/@item.ImageName" alt="Recipe Card Image">
+                    <div class="card-img-overlay d-flex flex-row-reverse">
+                        <div class="px-2 rounded bg-success" style="height:25px;">@Html.DisplayFor(modelItem => item.Type)</div>
+                    </div>
+                    <h5 class="card-title text-truncate text-center mt-1">@item.Name</h5>
+                    <div class="col-12 p-2 d-flex justify-content-between">
+                        <div><i class="fa-solid fa-star d-block text-center"></i>@difficulties[item.Difficulty-1]</div>
+                        <div><i class="fa-solid fa-clock d-block text-center"></i>@item.PreparationTime min.</div>
+                        <div><i class="fa-solid fa-temperature-high d-block text-center"></i>@item.CookingTime min.</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+    </div>
+}

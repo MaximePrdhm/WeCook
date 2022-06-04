@@ -1,4 +1,5 @@
-﻿@using WeCook.Models.Recipes
+﻿@using System.Security.Claims
+@using WeCook.Models.Recipes
 @model WeCook.Models.Recipes.Recipe
 
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery csrf
@@ -15,10 +16,13 @@
 
     var preparation = (Model.PreparationTime != 0) ? Model.PreparationTime.ToString() : "-";
     var cooking = (Model.CookingTime != 0) ? Model.CookingTime.ToString() : "-";
+
+    var logonId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 }
 
 <input type="hidden" id="RequestCsrfToken" name="RequestCsrfToken" value="@GetAntiCsrfToken()"/>
 <input type="hidden" asp-for="Id" />
+<input type="hidden" id="LogonUserId" value="@logonId" />
 
 <div class="d-flex">
     <div class="col-8 mx-auto border border-secondary rounded d-flex flex-column align-items-center">
@@ -106,25 +110,48 @@
             <h3 class="text-center">Auteur</h3>
             <div class="col-11 mx-auto rounded d-flex flex-row p-1 align-items-center mb-3" style="background-color: #D3D3D3;">
                 <div class="ms-1">
-                    <img src="~/img/avatar.jpg" class="rounded-circle" height="64px" width="64px" alt="Recipe Creator Avatar"/>
+                    <img src="~/uploads/users/@Model.Creator.AvatarName" class="rounded-circle" height="64px" width="64px" alt="Recipe Creator Avatar"/>
                 </div>
                 <div class="ms-2 flex-grow-1 d-flex flex-column">
-                    <div class="fw-bolder">John Doe</div>
-                    <div>3 recettes créées</div>
-                    <div class="text-muted">Membre depuis le 31 Septembre 2022</div>
+                    <div class="fw-bolder">@Model.Creator.FirstName @Model.Creator.Name</div>
+                    @if(ViewBag.OwnerRecipeCount == 1)
+                    {
+                        <div>@ViewBag.OwnerRecipeCount recette créée</div>
+                    } else
+                    {
+                        <div>@ViewBag.OwnerRecipeCount recettes créées</div>
+                    }
+                    <div class="text-muted">Membre depuis le @Model.Creator.RegisteredAt.ToString("dd MMMM yyyy")</div>
                 </div>
             </div>
 
             <h3 class="text-center">Actions</h3>
             <div class="col-8 mx-auto">
-                <button class="mb-4 w-100 btn btn-info"><i class="fa-solid fa-heart me-2"></i>Ajouter à mon carnet</button>
-                <a class="mb-2 w-100 btn btn-warning" asp-action="Edit" asp-route-id="@Model.Id"><i class="fa-solid fa-pen-to-square me-2"></i>Modifier</a>
-                <a class="mb-2 w-100 btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id"><i class="fa-solid fa-trash me-2"></i>Supprimer</a>
+                <div id="like-btn-container">
+                    @if (logonId != Model.CreatorId) 
+                    { 
+                        if(Model.Likes.Where(l => l.UserId == logonId && l.RecipeId == Model.Id).Count() == 1)
+                        {
+                            <div class="w-100 mb-2 text-center">Vous aimez déjà cette recette.</div>
+                            <button class="mb-4 w-100 btn btn-info" id="dislike-recipe-btn"><i class="fa-solid fa-xmark me-2"></i>Retirer de mon carnet</button>
+                        }
+                        else
+                        {
+                            <button class="mb-4 w-100 btn btn-info" id="like-recipe-btn"><i class="fa-solid fa-heart me-2"></i>Ajouter à mon carnet</button>
+                        }
+                    }
+                </div>
+                @if(logonId == Model.CreatorId)
+                {
+                    <a class="mb-2 w-100 btn btn-warning" asp-action="Edit" asp-route-id="@Model.Id"><i class="fa-solid fa-pen-to-square me-2"></i>Modifier</a>
+                    <a class="mb-2 w-100 btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id"><i class="fa-solid fa-trash me-2"></i>Supprimer</a>
+                }    
             </div>
         </div>    
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/RecipeLike.js"></script>
     <script src="~/js/IngredientProportions.js"></script>
 }

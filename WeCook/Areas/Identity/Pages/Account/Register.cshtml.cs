@@ -177,6 +177,7 @@ namespace WeCook.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.FirstName = Input.FirstName;
                 user.Name = Input.LastName;
+                user.RegisteredAt = DateTime.Today;
                 user.BirthDate = new DateTime(Input.BirthYear, Input.BirthMonth, Input.BirthDay);
                 
                 var fileName = $"${Guid.NewGuid()}{Path.GetExtension(Input.ImageFile.FileName)}";

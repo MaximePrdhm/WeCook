@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using WeCook.Models.Recipes.Utils;
 
 namespace WeCook.Controllers
 {
+    [Authorize]
     public class RecipesController : Controller
     {
         private readonly WeCookDbContext _context;
@@ -41,8 +44,14 @@ namespace WeCook.Controllers
             var recipe = await _context.Recipes
                 .Include(r => r.Ingredients)
                 .Include(r => r.Steps)
+                .Include(r => r.Creator)
+                .Include(r => r.Likes)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
+            var ownerRecipeCount = _context.Recipes
+                .Include(r => r.Creator)
+                .Where(r => r.CreatorId == recipe.CreatorId)
+                .Count();
+            ViewBag.OwnerRecipeCount = ownerRecipeCount;
             if (recipe == null)
             {
                 return NotFound();
@@ -68,6 +77,27 @@ namespace WeCook.Controllers
             return Json(calculator.ComputeFor(wantedAmount));
         }
 
+        [ValidateAntiForgeryToken]
+        public JsonResult RecipeBookUpdate()
+        {
+            var recipeId = int.Parse(HttpContext.Request.Query["recipeId"].ToString());
+            var userId = HttpContext.Request.Query["userId"].ToString();
+            var action = HttpContext.Request.Query["action"].ToString();
+
+            var tuple = new UserRecipe() { RecipeId = recipeId, UserId = userId };
+
+            if(action == "like")
+            {
+                _context.Add(tuple);
+            } else if(action == "dislike")
+            {
+                _context.Remove(tuple);
+            }
+            _context.SaveChanges();
+
+            return Json("");
+        }
+
         // GET: Recipes/Create
         public IActionResult Create()
         {
@@ -90,6 +120,8 @@ namespace WeCook.Controllers
                     await recipe.ImageFile.CopyToAsync(fileStream);
                 }
                 recipe.ImageName = fileName;
+                
+                recipe.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                 for(int i = 1; i <= recipe.Steps.Count; i++)
                 {
@@ -98,6 +130,7 @@ namespace WeCook.Controllers
 
                 _context.Add(recipe);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(recipe);
@@ -114,11 +147,18 @@ namespace WeCook.Controllers
             var recipe = await _context.Recipes
                 .Include(r => r.Ingredients)
                 .Include(r => r.Steps)
+                .Include(r => r.Creator)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (recipe == null)
             {
                 return NotFound();
             }
+
+            if(User.FindFirst(ClaimTypes.NameIdentifier).Value != recipe.CreatorId)
+            {
+                return RedirectToAction("Index", "Recipes");
+            }
+
             return View(recipe);
         }
 
@@ -132,6 +172,12 @@ namespace WeCook.Controllers
             if (id != recipe.Id)
             {
                 return NotFound();
+            }
+
+            var target = _context.Recipes.Include(r => r.Creator).Where(r => r.Id == id).First();
+            if (User.FindFirst(ClaimTypes.NameIdentifier).Value != target.CreatorId)
+            {
+                return RedirectToAction("Index", "Recipes");
             }
 
             if (ModelState.IsValid)
@@ -204,10 +250,18 @@ namespace WeCook.Controllers
             }
 
             var recipe = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .Include(r => r.Creator)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (recipe == null)
             {
                 return NotFound();
+            }
+
+            if (User.FindFirst(ClaimTypes.NameIdentifier).Value != recipe.CreatorId)
+            {
+                return RedirectToAction("Index", "Recipes");
             }
 
             return View(recipe);
@@ -222,7 +276,11 @@ namespace WeCook.Controllers
             {
                 return Problem("Entity set 'WeCookDbContext.Recipes'  is null.");
             }
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = _context.Recipes.Include(r => r.Creator).Where(r => r.Id == id).First();
+            if (User.FindFirst(ClaimTypes.NameIdentifier).Value != recipe.CreatorId)
+            {
+                return RedirectToAction("Index", "Recipes");
+            }
             if (recipe != null)
             {
                 _context.Recipes.Remove(recipe);

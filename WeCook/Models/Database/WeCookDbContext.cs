@@ -17,6 +17,8 @@ namespace WeCook.Models.Database
 
             builder.Entity<Recipe>().Property(r => r.Duration).HasComputedColumnSql($"{nameof(Recipe.PreparationTime)} + {nameof(Recipe.CookingTime)}");
             builder.Entity<Recipe>().Property(r => r.Type).HasConversion(v => v.ToString(), v => (RecipeType)Enum.Parse(typeof(RecipeType), v));
+
+            builder.Entity<UserRecipe>().ToTable("Likes").HasKey(ur => new { ur.UserId, ur.RecipeId });
         }
 
         public DbSet<Recipe> Recipes { get; set; }
